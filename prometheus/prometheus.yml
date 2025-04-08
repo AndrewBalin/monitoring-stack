@@ -1,0 +1,51 @@
+# prometheus/prometheus.yml
+global:
+  scrape_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+rule_files:
+  - 'alerts.yml'
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq-exporter:9419']
+
+# ---- <SERVICE_NAME> ----
+
+  - job_name: <SERVICE_NAME>
+    static_configs:
+      - targets: [ <SERVICE_ADDRESS> ]
+
+  - job_name: blackbox-<SERVICE_NAME>
+    metrics_path: /probe
+    scrape_interval: 5s
+    params:
+      module: [ http_2xx ]
+    static_configs:
+      - targets:
+          - <SERVICE_HEALTH_ADDRESS>
+        labels:
+          service_name: <SERVICE_NAME>
+
+    relabel_configs:
+      - source_labels: [ __address__ ]
+        target_label: __param_target
+
+      - source_labels: [ __param_target ]
+        target_label: instance
+
+      - target_label: __address__
+        replacement: blackbox:9115

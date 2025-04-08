@@ -1,0 +1,54 @@
+groups:
+- name: microservice-alerts
+  rules:
+  - alert: ServiceDown
+    expr: probe_success == 0
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{ $labels.service_name }} недоступен!"
+      title: "Сервис недоступен"
+      description: "Сервис {{ $labels.service_name }} не отвечает на /health."
+
+  - alert: Service5xx
+    expr: http_requests_total{status_code=~"5.."} > 0
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.instance }} возвращает 5xx"
+      title: "Ошибки 5xx"
+      description: "Сервис {{ $labels.instance }} за последнюю минуту вернул коды ошибок 5xx."
+
+- name: rabbitmq-alerts
+  rules:
+  - alert: RabbitQueueGrowing
+    expr: rabbitmq_queue_messages_ready - rabbitmq_queue_messages_unacknowledged > 100
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Очередь {{ $labels.queue }} растет и не обрабатывается"
+      title: "Очередь переполняется"
+      description: "Очередь {{ $labels.queue }} на хосте {{ $labels.instance }} растёт быстрее, чем обрабатывается."
+
+  - alert: RabbitQueueUnprocessed
+    expr: rate(rabbitmq_queue_messages_ready[1m]) > rate(rabbitmq_queue_messages_ack[1m])
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Сообщения в очереди {{ $labels.queue }} не обрабатываются или скорость их обработки слишком мала!"
+      title: "Очередь не обрабатывается"
+      description: "На очереди {{ $labels.queue }} приходят сообщения, но они не подтверждаются — вероятно потребитель не работает."
+
+  - alert: RabbitMassUpload
+    expr: rabbitmq_queue_messages_unacknowledged > 10000
+    for: 2m
+    labels:
+      severity: info
+    annotations:
+      summary: "Началась массовая загрузка в очереди {{ $labels.queue }}"
+      title: "Началась массовая загрузка"
+      description: "В очереди {{ $labels.queue }} более 10 000 сообщений."

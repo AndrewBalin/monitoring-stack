@@ -1,0 +1,26 @@
+{{ define "telegram.default.message" }}
+{{ if eq .Status "firing" }}
+{{ if eq .CommonLabels.severity "critical" }}🔴 *Авария:* {{ .CommonLabels.alertname }}
+{{ else if eq .CommonLabels.severity "warning" }}🟠 *Предупреждение:* {{ .CommonLabels.alertname }}
+{{ else }}⚪️ *Оповещение:* {{ .CommonLabels.alertname }}
+{{ end }}
+*Статус:* 🔥 ОШИБКА
+*Уровень:* {{ if eq .CommonLabels.severity "critical" }}🔴 **Критично**{{ else if eq .CommonLabels.severity "warning" }}🟠 **Предупреждение**{{ else }}⚪️ **Инфо**{{ end }}
+*Начало:* {{ (index .Alerts 0).StartsAt }}
+
+{{ else if eq .Status "resolved" }}
+{{ if eq .CommonLabels.severity "critical" }}🟢 *Авария устранена:* {{ .CommonLabels.alertname }}
+{{ else if eq .CommonLabels.severity "warning" }}🟢 *Предупреждение устранено:* {{ .CommonLabels.alertname }}
+{{ else }}⚪️ *Оповещение закрыто:* {{ .CommonLabels.alertname }}
+{{ end }}
+*Статус:* ✅ ВОССТАНОВЛЕНО
+*Уровень:* {{ if eq .CommonLabels.severity "critical" }}🟢 **Критично**{{ else if eq .CommonLabels.severity "warning" }}🟢 **Предупреждение**{{ else }}⚪️ **Инфо**{{ end }}
+*Начало:* {{ (index .Alerts 0).StartsAt }}
+*Конец:* {{ (index .Alerts 0).EndsAt }}
+{{ end }}
+
+{{- $a := index .Alerts 0 }}
+*Источник:* `{{ $a.Labels.instance }}`
+  - *Заголовок:* {{ $a.Annotations.title }}
+  - *Описание:* {{ $a.Annotations.description }}
+{{ end }}
