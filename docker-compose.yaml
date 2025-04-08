@@ -49,9 +49,9 @@ services:
     image: kbudde/rabbitmq-exporter:latest
     container_name: rabbitmq-exporter
     environment:
-      RABBIT_URL: http://mars-rabbitmq:15672
-      RABBIT_USER: user
-      RABBIT_PASSWORD: Zy8-G3p-czN-b3A
+      RABBIT_URL: <RABBIT_ADDRESS>
+      RABBIT_USER: <RABBIT_USERNAME>
+      RABBIT_PASSWORD: <RABBIT_PASSWORD>
     expose:
       - "9419"
     networks:
