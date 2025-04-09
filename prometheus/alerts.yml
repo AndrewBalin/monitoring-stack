@@ -52,3 +52,23 @@ groups:
       summary: "Началась массовая загрузка в очереди {{ $labels.queue }}"
       title: "Началась массовая загрузка"
       description: "В очереди {{ $labels.queue }} более 10 000 сообщений."
+
+  - alert: RabbitMQDown
+    expr: sum(rabbitmq_up) == 0
+    for: 15s
+    labels:
+      severity: critical
+    annotations:
+      summary: "Все RabbitMQ ноды не работают"
+      title: "RabbitMQ не работает"
+      description: "Экспортер {{ $labels.instance }} сообщил, что ноды RabbitMQ не отвечают"
+
+  - alert: RabbitMQInstanceDown
+    expr: rabbitmq_up == 0
+    for: 15s
+    labels:
+      severity: warning
+    annotations:
+      summary: "RabbitMQ нода {{ $labels.node }} не работает"
+      title: "Одна из нод RabbitMQ не работает"
+      description: "Экспортер {{ $labels.instance }} сообщил, что нода {{ $labels.node }} RabbitMQ не отвечают"

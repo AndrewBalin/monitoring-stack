@@ -7,7 +7,6 @@
 *Статус:* 🔥 ОШИБКА
 *Уровень:* {{ if eq .CommonLabels.severity "critical" }}🔴 **Критично**{{ else if eq .CommonLabels.severity "warning" }}🟠 **Предупреждение**{{ else }}⚪️ **Инфо**{{ end }}
 *Начало:* {{ (index .Alerts 0).StartsAt }}
-
 {{ else if eq .Status "resolved" }}
 {{ if eq .CommonLabels.severity "critical" }}🟢 *Авария устранена:* {{ .CommonLabels.alertname }}
 {{ else if eq .CommonLabels.severity "warning" }}🟢 *Предупреждение устранено:* {{ .CommonLabels.alertname }}
